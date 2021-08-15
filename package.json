@@ -1,6 +1,6 @@
 {
-  "name": "react-calendar",
-  "version": "3.4.0",
+  "name": "@qingleili/react-calendar",
+  "version": "4.0.0",
   "description": "Ultimate calendar for your React app.",
   "main": "dist/umd/index.js",
   "module": "dist/esm/index.js",
@@ -113,7 +113,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/wojtekmaj/react-calendar.git"
-  },
-  "funding": "https://github.com/wojtekmaj/react-calendar?sponsor=1"
+    "url": "https://github.com/QingLeiLi/react-calendar.git",
+    "oriGit": "https://github.com/wojtekmaj/react-calendar.git"
+  }
 }

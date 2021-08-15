@@ -47,6 +47,7 @@ export default function Navigation({
   const shouldShowPrevNext2Buttons = view !== 'century';
 
   const previousActiveStartDate = getBeginPrevious(view, activeStartDate);
+  // 获取上一个大步进的值
   const previousActiveStartDate2 = (
     shouldShowPrevNext2Buttons
     && getBeginPrevious2(view, activeStartDate)
@@ -103,6 +104,9 @@ export default function Navigation({
           return getDecadeLabel(locale, formatYear, date);
         case 'year':
           return formatYear(locale, date);
+        case 'yearQuarter':
+          // 季度中间显示年
+          return formatYear(locale, date);
         case 'month':
           return formatMonthYear(locale, date);
         default:
@@ -154,6 +158,7 @@ export default function Navigation({
 
   return (
     <div className={className}>
+      {/* 两个箭头大的步进 */}
       {prev2Label !== null && shouldShowPrevNext2Buttons && (
         <button
           aria-label={prev2AriaLabel}
@@ -165,6 +170,7 @@ export default function Navigation({
           {prev2Label}
         </button>
       )}
+      {/* 小步进 */}
       {prevLabel !== null && (
         <button
           aria-label={prevAriaLabel}
@@ -176,6 +182,7 @@ export default function Navigation({
           {prevLabel}
         </button>
       )}
+      {/* 渲染中间的上卷 */}
       {renderButton()}
       {nextLabel !== null && (
         <button

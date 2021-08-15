@@ -7,6 +7,7 @@ import CenturyView from './CenturyView';
 import DecadeView from './DecadeView';
 import YearView from './YearView';
 import MonthView from './MonthView';
+import YearQuarterView from './YearQuarterView';
 
 import {
   getBegin, getBeginNext, getEnd, getValueRange,
@@ -22,8 +23,6 @@ defaultMinDate.setHours(0, 0, 0, 0);
 const defaultMaxDate = new Date(8.64e15);
 
 const baseClassName = 'react-calendar';
-const allViews = ['century', 'decade', 'year', 'month'];
-const allValueTypes = [...allViews.slice(1), 'day'];
 
 function toDate(value) {
   if (value instanceof Date) {
@@ -31,41 +30,6 @@ function toDate(value) {
   }
 
   return new Date(value);
-}
-
-/**
- * Returns views array with disallowed values cut off.
- */
-function getLimitedViews(minDetail, maxDetail) {
-  return allViews.slice(allViews.indexOf(minDetail), allViews.indexOf(maxDetail) + 1);
-}
-
-/**
- * Determines whether a given view is allowed with currently applied settings.
- */
-function isViewAllowed(view, minDetail, maxDetail) {
-  const views = getLimitedViews(minDetail, maxDetail);
-
-  return views.indexOf(view) !== -1;
-}
-
-/**
- * Gets either provided view if allowed by minDetail and maxDetail, or gets
- * the default view if not allowed.
- */
-function getView(view, minDetail, maxDetail) {
-  if (isViewAllowed(view, minDetail, maxDetail)) {
-    return view;
-  }
-
-  return maxDetail;
-}
-
-/**
- * Returns value type that can be returned with currently applied settings.
- */
-function getValueType(maxDetail) {
-  return allValueTypes[allViews.indexOf(maxDetail)];
 }
 
 function getValue(value, index) {
@@ -88,88 +52,153 @@ function getValue(value, index) {
   return valueDate;
 }
 
-function getDetailValue({
-  value, minDate, maxDate, maxDetail,
-}, index) {
-  const valuePiece = getValue(value, index);
-
-  if (!valuePiece) {
-    return null;
-  }
-
-  const valueType = getValueType(maxDetail);
-  const detailValueFrom = [getBegin, getEnd][index](valueType, valuePiece);
-
-  return between(detailValueFrom, minDate, maxDate);
-}
-
-const getDetailValueFrom = (args) => getDetailValue(args, 0);
-
-const getDetailValueTo = (args) => getDetailValue(args, 1);
-
-const getDetailValueArray = (args) => {
-  const { value } = args;
-
-  if (Array.isArray(value)) {
-    return value;
-  }
-
-  return [getDetailValueFrom, getDetailValueTo].map((fn) => fn(args));
-};
-
-function getActiveStartDate(props) {
-  const {
-    maxDate,
-    maxDetail,
-    minDate,
-    minDetail,
-    value,
-    view,
-  } = props;
-
-  const rangeType = getView(view, minDetail, maxDetail);
-  const valueFrom = (
-    getDetailValueFrom({
-      value, minDate, maxDate, maxDetail,
-    })
-    || new Date()
-  );
-
-  return getBegin(rangeType, valueFrom);
-}
-
-function getInitialActiveStartDate(props) {
-  const {
-    activeStartDate,
-    defaultActiveStartDate,
-    defaultValue,
-    defaultView,
-    maxDetail,
-    minDetail,
-    value,
-    view,
-    ...otherProps
-  } = props;
-
-  const rangeType = getView(view, minDetail, maxDetail);
-  const valueFrom = activeStartDate || defaultActiveStartDate;
-
-  if (valueFrom) {
-    return getBegin(rangeType, valueFrom);
-  }
-
-  return getActiveStartDate({
-    maxDetail,
-    minDetail,
-    value: value || defaultValue,
-    view: view || defaultView,
-    ...otherProps,
-  });
-}
-
 const getIsSingleValue = (value) => value && [].concat(value).length === 1;
 
 export default class Calendar extends Component {
+
+  allBaseViews = ['century', 'decade', 'year', 'month'];
+  // const allValueTypes = [...allViews.slice(1), 'day'];
+
+  get allViews() {
+    const {
+      maxDetail,
+    } = this.props;
+    if (maxDetail === 'yearQuarter') {
+      const clone = [...this.allBaseViews];
+      const yearIndex = clone.indexOf('year');
+      clone.splice(yearIndex + 1, 0, 'yearQuarter');
+      return clone;
+    }
+    return this.allBaseViews;
+  }
+
+  view2ValueType = {
+    century: 'decade',
+    decade: 'year',
+    year: 'month',
+    yearQuarter: 'yearQuarter',
+    month: 'day',
+  }
+
+  get allValueTypes() {
+    return this.allViews.map(view => this.view2ValueType[view]);
+    // return [...this.allViews.slice(1), 'day'];
+  }
+
+  /**
+   * Returns value type that can be returned with currently applied settings.
+   */
+  getValueType(maxDetail) {
+    return this.allValueTypes[this.allViews.indexOf(maxDetail)];
+  }
+
+  getDetailValue({
+    value, minDate, maxDate, maxDetail,
+  }, index) {
+    const valuePiece = getValue(value, index);
+  
+    if (!valuePiece) {
+      return null;
+    }
+  
+    const valueType = this.getValueType(maxDetail);
+    const detailValueFrom = [getBegin, getEnd][index](valueType, valuePiece);
+  
+    return between(detailValueFrom, minDate, maxDate);
+  }
+
+  getDetailValueFrom = (args) => this.getDetailValue(args, 0);
+
+  getDetailValueTo = (args) => this.getDetailValue(args, 1);
+
+  getDetailValueArray = (args) => {
+    const { value } = args;
+  
+    if (Array.isArray(value)) {
+      return value;
+    }
+  
+    return [this.getDetailValueFrom, this.getDetailValueTo].map((fn) => fn(args));
+  };
+
+  /**
+   * Returns views array with disallowed values cut off.
+   */
+  getLimitedViews(minDetail, maxDetail) {
+    return this.allViews.slice(this.allViews.indexOf(minDetail), this.allViews.indexOf(maxDetail) + 1);
+  }
+
+  /**
+   * Determines whether a given view is allowed with currently applied settings.
+   */
+  isViewAllowed(view, minDetail, maxDetail) {
+    const views = this.getLimitedViews(minDetail, maxDetail);
+
+    return views.indexOf(view) !== -1;
+  }
+
+  /**
+   * Gets either provided view if allowed by minDetail and maxDetail, or gets
+   * the default view if not allowed.
+   */
+  getView(view, minDetail, maxDetail) {
+    if (this.isViewAllowed(view, minDetail, maxDetail)) {
+      return view;
+    }
+
+    return maxDetail;
+  }
+
+  getActiveStartDate(props) {
+    const {
+      maxDate,
+      maxDetail,
+      minDate,
+      minDetail,
+      value,
+      view,
+    } = props;
+  
+    const rangeType = this.getView(view, minDetail, maxDetail);
+    const valueFrom = (
+      this.getDetailValueFrom({
+        value, minDate, maxDate, maxDetail,
+      })
+      || new Date()
+    );
+  
+    return getBegin(rangeType, valueFrom);
+  }
+
+  getInitialActiveStartDate(props) {
+    const {
+      activeStartDate,
+      defaultActiveStartDate,
+      defaultValue,
+      defaultView,
+      maxDetail,
+      minDetail,
+      value,
+      view,
+      ...otherProps
+    } = props;
+  
+    const rangeType = this.getView(view, minDetail, maxDetail);
+    const valueFrom = activeStartDate || defaultActiveStartDate;
+  
+    if (valueFrom) {
+      return getBegin(rangeType, valueFrom);
+    }
+  
+    return this.getActiveStartDate({
+      maxDetail,
+      minDetail,
+      value: value || defaultValue,
+      view: view || defaultView,
+      ...otherProps,
+    });
+  }
+
   state = {
     /* eslint-disable react/destructuring-assignment */
     activeStartDate: this.props.defaultActiveStartDate,
@@ -182,7 +211,7 @@ export default class Calendar extends Component {
     const { activeStartDate: activeStartDateProps } = this.props;
     const { activeStartDate: activeStartDateState } = this.state;
 
-    return activeStartDateProps || activeStartDateState || getInitialActiveStartDate(this.props);
+    return activeStartDateProps || activeStartDateState || this.getInitialActiveStartDate(this.props);
   }
 
   get value() {
@@ -200,20 +229,20 @@ export default class Calendar extends Component {
   get valueType() {
     const { maxDetail } = this.props;
 
-    return getValueType(maxDetail);
+    return this.getValueType(maxDetail);
   }
 
   get view() {
     const { minDetail, maxDetail, view: viewProps } = this.props;
     const { view: viewState } = this.state;
 
-    return getView(viewProps || viewState, minDetail, maxDetail);
+    return this.getView(viewProps || viewState, minDetail, maxDetail);
   }
 
   get views() {
     const { minDetail, maxDetail } = this.props;
 
-    return getLimitedViews(minDetail, maxDetail);
+    return this.getLimitedViews(minDetail, maxDetail);
   }
 
   get hover() {
@@ -245,9 +274,9 @@ export default class Calendar extends Component {
 
     const processFunction = (() => {
       switch (returnValue) {
-        case 'start': return getDetailValueFrom;
-        case 'end': return getDetailValueTo;
-        case 'range': return getDetailValueArray;
+        case 'start': return this.getDetailValueFrom;
+        case 'end': return this.getDetailValueTo;
+        case 'range': return this.getDetailValueArray;
         default: throw new Error('Invalid returnValue.');
       }
     })();
@@ -346,13 +375,13 @@ export default class Calendar extends Component {
     const { onDrillDown } = this.props;
 
     const nextView = views[views.indexOf(view) + 1];
-
     this.setStateAndCallCallbacks({
       activeStartDate: nextActiveStartDate,
       view: nextView,
     }, undefined, onDrillDown);
   }
 
+  // 点击导航进行上卷
   drillUp = () => {
     if (!this.drillUpAvailable) {
       return;
@@ -362,6 +391,7 @@ export default class Calendar extends Component {
     const { onDrillUp } = this.props;
 
     const nextView = views[views.indexOf(view) - 1];
+    // 获取下一个视图的开始时间
     const nextActiveStartDate = getBegin(nextView, activeStartDate);
 
     this.setStateAndCallCallbacks({
@@ -392,7 +422,7 @@ export default class Calendar extends Component {
       nextValue = this.getProcessedValue(value);
     }
 
-    const nextActiveStartDate = getActiveStartDate({
+    const nextActiveStartDate = this.getActiveStartDate({
       ...this.props,
       value: nextValue,
     });
@@ -405,6 +435,7 @@ export default class Calendar extends Component {
     }, event);
   }
 
+  // 这里只是给外部一个通知
   onClickTile = (value, event) => {
     const { view } = this;
     const {
@@ -412,6 +443,7 @@ export default class Calendar extends Component {
       onClickDecade,
       onClickMonth,
       onClickYear,
+      onClickQuarter,
     } = this.props;
 
     const callback = (() => {
@@ -424,6 +456,8 @@ export default class Calendar extends Component {
           return onClickMonth;
         case 'month':
           return onClickDay;
+        case 'yearQuarter':
+          return onClickQuarter;
         default:
           throw new Error(`Invalid view: ${view}.`);
       }
@@ -517,6 +551,13 @@ export default class Calendar extends Component {
           <YearView
             formatMonth={formatMonth}
             formatMonthYear={formatMonthYear}
+            {...commonProps}
+          />
+        );
+      }
+      case 'yearQuarter': {
+        return (
+          <YearQuarterView
             {...commonProps}
           />
         );
@@ -675,9 +716,9 @@ Calendar.propTypes = {
   inputRef: isRef,
   locale: PropTypes.string,
   maxDate: isMaxDate,
-  maxDetail: PropTypes.oneOf(allViews),
+  maxDetail: PropTypes.oneOf(['century', 'decade', 'yearQuarter', 'year', 'month']),
   minDate: isMinDate,
-  minDetail: PropTypes.oneOf(allViews),
+  minDetail: PropTypes.oneOf(['century', 'decade', 'yearQuarter', 'year', 'month']),
   navigationAriaLabel: PropTypes.string,
   navigationLabel: PropTypes.func,
   next2AriaLabel: PropTypes.string,
@@ -689,6 +730,7 @@ Calendar.propTypes = {
   onClickDay: PropTypes.func,
   onClickDecade: PropTypes.func,
   onClickMonth: PropTypes.func,
+  onClickQuarter: PropTypes.func,
   onClickWeekNumber: PropTypes.func,
   onClickYear: PropTypes.func,
   onDrillDown: PropTypes.func,

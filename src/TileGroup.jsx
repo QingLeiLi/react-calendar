@@ -8,7 +8,9 @@ import { tileGroupProps } from './shared/propTypes';
 
 export default function TileGroup({
   className,
+  // 一行显示几个
   count = 3,
+  // 根据 index 循环得到日期
   dateTransform,
   dateType,
   end,
@@ -28,11 +30,13 @@ export default function TileGroup({
     tiles.push(
       <Tile
         key={date.getTime()}
+        // 这里的类会判断选中态和今天的高亮态
         classes={getTileClasses({
           value, valueType, date, dateType, hover,
         })}
         date={date}
         point={point}
+        index={point}
         {...tileProps}
       />,
     );

@@ -35,6 +35,8 @@ import {
   getDayRange,
 } from '@wojtekmaj/date-utils';
 
+import getQuarterEnd from './getQuarterEnd';
+import getQuarterStart from './getQuarterStart';
 import { CALENDAR_TYPES, WEEKDAYS } from './const';
 import { formatYear as defaultFormatYear } from './dateFormatter';
 
@@ -139,6 +141,8 @@ export function getBegin(rangeType, date) {
     case 'century': return getCenturyStart(date);
     case 'decade': return getDecadeStart(date);
     case 'year': return getYearStart(date);
+    // 获取季度的开始时间
+    case 'yearQuarter': return getQuarterStart(date);
     case 'month': return getMonthStart(date);
     case 'day': return getDayStart(date);
     default: throw new Error(`Invalid rangeType: ${rangeType}`);
@@ -151,6 +155,8 @@ export function getBeginPrevious(rangeType, date) {
     case 'decade': return getPreviousDecadeStart(date);
     case 'year': return getPreviousYearStart(date);
     case 'month': return getPreviousMonthStart(date);
+    // 小步进，一年
+    case 'yearQuarter': return getPreviousYearStart(date);
     default: throw new Error(`Invalid rangeType: ${rangeType}`);
   }
 }
@@ -161,15 +167,20 @@ export function getBeginNext(rangeType, date) {
     case 'decade': return getNextDecadeStart(date);
     case 'year': return getNextYearStart(date);
     case 'month': return getNextMonthStart(date);
+    // 小步进一年
+    case 'yearQuarter': return getNextYearStart(date);
     default: throw new Error(`Invalid rangeType: ${rangeType}`);
   }
 }
 
+// 获取大步进的上一个值
 export const getBeginPrevious2 = (rangeType, date) => {
   switch (rangeType) {
     case 'decade': return getPreviousDecadeStart(date, -100);
     case 'year': return getPreviousYearStart(date, -10);
     case 'month': return getPreviousMonthStart(date, -12);
+    // 大步进十年
+    case 'yearQuarter': return getPreviousYearStart(date, -10);
     default: throw new Error(`Invalid rangeType: ${rangeType}`);
   }
 };
@@ -179,6 +190,8 @@ export const getBeginNext2 = (rangeType, date) => {
     case 'decade': return getNextDecadeStart(date, 100);
     case 'year': return getNextYearStart(date, 10);
     case 'month': return getNextMonthStart(date, 12);
+    // 大步进十年
+    case 'yearQuarter': return getNextYearStart(date, 10);
     default: throw new Error(`Invalid rangeType: ${rangeType}`);
   }
 };
@@ -196,6 +209,7 @@ export function getEnd(rangeType, date) {
     case 'year': return getYearEnd(date);
     case 'month': return getMonthEnd(date);
     case 'day': return getDayEnd(date);
+    case 'yearQuarter': return getQuarterEnd(date);
     default: throw new Error(`Invalid rangeType: ${rangeType}`);
   }
 }
@@ -206,6 +220,7 @@ export function getEndPrevious(rangeType, date) {
     case 'decade': return getPreviousDecadeEnd(date);
     case 'year': return getPreviousYearEnd(date);
     case 'month': return getPreviousMonthEnd(date);
+    case 'yearQuarter': return date;
     default: throw new Error(`Invalid rangeType: ${rangeType}`);
   }
 }
@@ -215,6 +230,7 @@ export const getEndPrevious2 = (rangeType, date) => {
     case 'decade': return getPreviousDecadeEnd(date, -100);
     case 'year': return getPreviousYearEnd(date, -10);
     case 'month': return getPreviousMonthEnd(date, -12);
+    case 'yearQuarter': return date;
     default: throw new Error(`Invalid rangeType: ${rangeType}`);
   }
 };
@@ -232,6 +248,7 @@ export function getRange(rangeType, date) {
     case 'year': return getYearRange(date);
     case 'month': return getMonthRange(date);
     case 'day': return getDayRange(date);
+    case 'yearQuarter': return [getQuarterStart(date), getQuarterStart(date)];
     default: throw new Error(`Invalid rangeType: ${rangeType}`);
   }
 }

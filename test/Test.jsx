@@ -219,18 +219,19 @@ export default function Test() {
             }}
           >
             <p>Controlled:</p>
-            <Calendar
+            {/* <Calendar
               {...commonProps}
               activeStartDate={activeStartDate}
               value={value}
               view={view}
-            />
+            /> */}
             <p>Uncontrolled:</p>
             <Calendar
               {...commonProps}
               defaultActiveStartDate={activeStartDate}
               defaultValue={value}
               defaultView={view}
+              maxDetail="yearQuarter"
             />
           </form>
           {renderDebugInfo()}
