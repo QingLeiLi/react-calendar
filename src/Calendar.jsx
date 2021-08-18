@@ -66,7 +66,7 @@ export default class Calendar extends Component {
     if (maxDetail === 'yearQuarter') {
       const clone = [...this.allBaseViews];
       const yearIndex = clone.indexOf('year');
-      clone.splice(yearIndex + 1, 0, 'yearQuarter');
+      clone.splice(yearIndex, 1, 'yearQuarter');
       return clone;
     }
     return this.allBaseViews;

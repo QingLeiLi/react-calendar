@@ -231,7 +231,7 @@ export default function Test() {
               defaultActiveStartDate={activeStartDate}
               defaultValue={value}
               defaultView={view}
-              maxDetail="yearQuarter"
+              maxDetail="month"
             />
           </form>
           {renderDebugInfo()}
