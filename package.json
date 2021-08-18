@@ -115,5 +115,8 @@
     "type": "git",
     "url": "https://github.com/QingLeiLi/react-calendar.git",
     "oriGit": "https://github.com/wojtekmaj/react-calendar.git"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
