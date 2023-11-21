@@ -55,6 +55,8 @@ export default function MonthView(props) {
         onClickWeekNumber={onClickWeekNumber}
         onMouseLeave={onMouseLeave}
         showFixedNumberOfWeeks={showFixedNumberOfWeeks}
+        minDate={childProps.minDate}
+        maxDate={childProps.maxDate}
       />
     );
   }

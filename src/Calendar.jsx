@@ -16,11 +16,7 @@ import {
   isCalendarType, isClassName, isMaxDate, isMinDate, isRef, isValue, isView,
 } from './shared/propTypes';
 import { between } from './shared/utils';
-
-const defaultMinDate = new Date();
-defaultMinDate.setFullYear(1, 0, 1);
-defaultMinDate.setHours(0, 0, 0, 0);
-const defaultMaxDate = new Date(8.64e15);
+import { defaultMinDate, defaultMaxDate } from './common';
 
 const baseClassName = 'react-calendar';
 

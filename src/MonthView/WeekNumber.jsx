@@ -5,20 +5,25 @@ export default function WeekNumber({
   date,
   onClickWeekNumber,
   weekNumber,
+  minWeekNumber,
+  maxWeekNumber,
 }) {
+  // @todo 在跨年的时候可能有问题
+  const isDisabled = weekNumber < minWeekNumber || weekNumber > maxWeekNumber;
   const props = {
-    className: 'react-calendar__tile',
+    className: `react-calendar__tile ${isDisabled ? 'react-calendar__tile-disabled' : ''}`,
     style: { flexGrow: 1 },
   };
 
   const children = (
     <span>
+      W
       {weekNumber}
     </span>
   );
 
   return (
-    onClickWeekNumber
+    (onClickWeekNumber && !isDisabled)
       ? (
         <button
           {...props}
@@ -38,6 +43,8 @@ export default function WeekNumber({
 
 WeekNumber.propTypes = {
   date: PropTypes.instanceOf(Date).isRequired,
+  maxWeekNumber: PropTypes.number,
+  minWeekNumber: PropTypes.number,
   onClickWeekNumber: PropTypes.func,
   weekNumber: PropTypes.node.isRequired,
 };

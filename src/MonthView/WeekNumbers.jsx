@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import {
   getYear,
@@ -16,6 +16,7 @@ import {
   getWeekNumber,
 } from '../shared/dates';
 import { isCalendarType } from '../shared/propTypes';
+import { defaultMaxDate, defaultMinDate } from '../common';
 
 export default function WeekNumbers(props) {
   const {
@@ -24,6 +25,8 @@ export default function WeekNumbers(props) {
     onClickWeekNumber,
     onMouseLeave,
     showFixedNumberOfWeeks,
+    minDate,
+    maxDate,
   } = props;
 
   const numberOfWeeks = (() => {
@@ -37,6 +40,24 @@ export default function WeekNumbers(props) {
     const days = numberOfDays - (7 - startWeekday);
     return 1 + Math.ceil(days / 7);
   })();
+
+  const [minWeekNumber, maxWeekNumber] = useMemo(() => {
+    let minNumber = -Infinity;
+    let maxNumber = Infinity;
+    if (minDate && defaultMinDate !== minDate) {
+      minNumber = getWeekNumber(minDate);
+    }
+    if (maxDate && defaultMaxDate !== maxDate) {
+      maxNumber = getWeekNumber(maxDate);
+    }
+    return [
+      minNumber,
+      maxNumber,
+    ];
+  }, [
+    minDate,
+    maxDate,
+  ]);
 
   const dates = (() => {
     const year = getYear(activeStartDate);
@@ -63,6 +84,11 @@ export default function WeekNumbers(props) {
       onMouseOver={onMouseLeave}
       style={{ flexBasis: 'calc(100% * (1 / 8)', flexShrink: 0 }}
     >
+      <div
+        className="react-calendar__month-view__weekNumbers-text"
+      >
+        周数
+      </div>
       {
         weekNumbers.map((weekNumber, weekIndex) => (
           <WeekNumber
@@ -70,6 +96,8 @@ export default function WeekNumbers(props) {
             date={dates[weekIndex]}
             onClickWeekNumber={onClickWeekNumber}
             weekNumber={weekNumber}
+            minWeekNumber={minWeekNumber}
+            maxWeekNumber={maxWeekNumber}
           />
         ))
       }
