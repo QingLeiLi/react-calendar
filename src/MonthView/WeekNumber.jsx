@@ -1,17 +1,41 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
+import { defaultMaxDate, defaultMinDate, getISOWeekStart, getISOWeekEnd } from '../common';
 
 export default function WeekNumber({
   date,
   onClickWeekNumber,
   weekNumber,
-  minWeekNumber,
-  maxWeekNumber,
+  minDate,
+  maxDate,
 }) {
+  const isDisabled = useMemo(() => {
+    try {
+      if (maxDate !== defaultMaxDate) {
+        const weekStart = getISOWeekStart(date);
+        if (weekStart > maxDate) {
+          return true;
+        }
+      }
+      if (minDate !== defaultMinDate) {
+        const weekEnd = getISOWeekEnd(date);
+        if (weekEnd < minDate) {
+          return true;
+        }
+      }
+    } catch (err) {
+      console.error(err);
+    }
+    return false;
+  }, [
+    minDate,
+    maxDate,
+    date,
+  ]);
   // @todo 在跨年的时候可能有问题
-  const isDisabled = weekNumber < minWeekNumber || weekNumber > maxWeekNumber;
+  // const isDisabled = weekNumber < minWeekNumber || weekNumber > maxWeekNumber;
   const props = {
-    className: `react-calendar__tile ${isDisabled ? 'react-calendar__tile-disabled' : ''}`,
+    className: `react-calendar__tile react-calendar__month-view__weeknumber ${isDisabled ? 'react-calendar__tile-disabled' : ''}`,
     style: { flexGrow: 1 },
   };
 

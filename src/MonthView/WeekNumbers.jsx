@@ -41,23 +41,23 @@ export default function WeekNumbers(props) {
     return 1 + Math.ceil(days / 7);
   })();
 
-  const [minWeekNumber, maxWeekNumber] = useMemo(() => {
-    let minNumber = -Infinity;
-    let maxNumber = Infinity;
-    if (minDate && defaultMinDate !== minDate) {
-      minNumber = getWeekNumber(minDate);
-    }
-    if (maxDate && defaultMaxDate !== maxDate) {
-      maxNumber = getWeekNumber(maxDate);
-    }
-    return [
-      minNumber,
-      maxNumber,
-    ];
-  }, [
-    minDate,
-    maxDate,
-  ]);
+  // const [minWeekNumber, maxWeekNumber] = useMemo(() => {
+  //   let minNumber = -Infinity;
+  //   let maxNumber = Infinity;
+  //   if (minDate && defaultMinDate !== minDate) {
+  //     minNumber = getWeekNumber(minDate);
+  //   }
+  //   if (maxDate && defaultMaxDate !== maxDate) {
+  //     maxNumber = getWeekNumber(maxDate);
+  //   }
+  //   return [
+  //     minNumber,
+  //     maxNumber,
+  //   ];
+  // }, [
+  //   minDate,
+  //   maxDate,
+  // ]);
 
   const dates = (() => {
     const year = getYear(activeStartDate);
@@ -96,8 +96,8 @@ export default function WeekNumbers(props) {
             date={dates[weekIndex]}
             onClickWeekNumber={onClickWeekNumber}
             weekNumber={weekNumber}
-            minWeekNumber={minWeekNumber}
-            maxWeekNumber={maxWeekNumber}
+            minDate={minDate}
+            maxDate={maxDate}
           />
         ))
       }
